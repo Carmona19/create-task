@@ -3,7 +3,6 @@ import random
 
 pygame.init()
 
-
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((900, 800))
 done = False
@@ -14,33 +13,39 @@ myFont = pygame.font.SysFont('Comic Sans MS', 100)
 myFontTimer = pygame.font.SysFont('Comic Sans MS', 25)
 myFontScore = pygame.font.SysFont('Comic Sans MS', 25)
 timer = pygame.time.get_ticks()
-
+enemnyCounter = []
 
 #            (x, y, Speed, shoot     score
-playership = [20,790,7,pygame.K_SPACE, 0]
+playership = [20, 790, 7, pygame.K_SPACE, 0]
 
 downEnemies = []
-
 
 
 def drawShip(playership):
     pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, 0, 900, 800), 0)
 
-    pointList = [(playership[0],playership[1]),(playership[0]+25,playership[1]-50),(playership[0]+50,playership[1])]
-    pygame.draw.polygon(screen,(150, 0, 181) ,pointList,0)
+    pointList = [(playership[0], playership[1]), (playership[0] + 25, playership[1] - 50),
+                 (playership[0] + 50, playership[1])]
+    pygame.draw.polygon(screen, (150, 0, 181), pointList, 0)
 
-    screenText = myFontTimer.render("Time " + str(((pygame.time.get_ticks())-restartTime)/1000), False, (255,255,255))
-    screen.blit(screenText, (400,10))
+    screenText = myFontTimer.render("Time " + str(((pygame.time.get_ticks()) - restartTime) / 1000), False,
+                                    (255, 255, 255))
+    screen.blit(screenText, (400, 10))
+
 
 # (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
 
 def moveShip(playership):
+
     pressed = pygame.key.get_pressed()
 
     if pressed[pygame.K_d]:
         playership[0] += playership[2]
+
     if pressed[pygame.K_a]:
         playership[0] -= playership[2]
+
+
 
 def initEnemies():
     global downEnemies
@@ -48,17 +53,22 @@ def initEnemies():
     downEnemies.append(pygame.Rect(200, -50, 25, 25))
     downEnemies.append(pygame.Rect(250, -50, 25, 25))
 
+
 def drawEnemies():
     for enemy in downEnemies:
-        pygame.draw.rect(screen,(255,0,0), enemy)
+        pygame.draw.rect(screen, (255, 0, 0), enemy)
+
 
 def moveEnemies():
     for enemy in downEnemies:
         enemy.y += 3
         if enemy.y > 800:
             enemy.y = -50
-            enemy.x = random.randint(0,780)
-        
+            enemy.x = random.randint(0, 780)
+        if enemy.x<playership[0]:
+            enemy.x += 3
+        else:
+            enemy.x -= 3
 
 
 def checkForCollisions():
@@ -67,7 +77,7 @@ def checkForCollisions():
     pointList = [(playership[0], playership[1]), (playership[0] + 25, playership[1] - 50),
                  (playership[0] + 50, playership[1])]
     for enemy in downEnemies:
-        if enemy.colliderect(pygame.draw.polygon(screen,(150, 0, 181),pointList,0)):
+        if enemy.colliderect(pygame.draw.polygon(screen, (150, 0, 181), pointList, 0)):
             gameStatus = "Gameover"
 
 
@@ -77,28 +87,25 @@ def resetGame():
     resetEnemies()
     initEnemies()
 
+
 def Updatescore():
     global gameStatus
     if gameStatus == "playing":
-        playership[4] = str(((pygame.time.get_ticks())-restartTime)/1000)
-
+        playership[4] = str(((pygame.time.get_ticks()) - restartTime) / 1000)
 
 
 def displayScore():
     textScoreSurface = myFontScore.render("Your Score: " + str(playership[4]),
-                                   False,
-                                   (255, 255, 255))
+                                          False,
+                                          (255, 255, 255))
     screen.blit(textScoreSurface, (400, 400))
 
+
 def drawGameOver():
-            pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, 0, 900, 800), 0)
+    pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, 0, 900, 800), 0)
 
-            textSurface = myFont.render("Gameover  ", False, (255, 255, 255))
-            screen.blit(textSurface, (250, 10))
-
-
-
-
+    textSurface = myFont.render("Gameover  ", False, (255, 255, 255))
+    screen.blit(textSurface, (250, 10))
 
 
 initEnemies()
@@ -132,7 +139,4 @@ while not done:
         drawGameOver()
         displayScore()
 
-
-
-        
     pygame.display.flip()
